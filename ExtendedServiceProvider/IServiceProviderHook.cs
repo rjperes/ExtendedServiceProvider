@@ -25,8 +25,11 @@ namespace ExtendedServiceProvider
 
                 if (injectPropertyAttribute != null)
                 {
-                    var propertyService = _serviceProvider.GetRequiredKeyedService(prop.PropertyType, injectPropertyAttribute.ServiceKey);
-                    prop.SetValue(service, propertyService);
+                    if (prop.GetValue(service) == null)
+                    {
+                        var propertyService = _serviceProvider.GetRequiredKeyedService(prop.PropertyType, injectPropertyAttribute.ServiceKey);
+                        prop.SetValue(service, propertyService);
+                    }
                 }
             }
         }

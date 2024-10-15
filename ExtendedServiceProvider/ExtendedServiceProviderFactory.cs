@@ -14,7 +14,7 @@ namespace ExtendedServiceProvider
             private readonly IServiceCollection _services;
             private readonly ILogger<ExtendedServiceProvider> _logger;
             private readonly IKeyedServiceProvider _serviceProvider;
-            private readonly IServiceProviderResolver? _resolver;
+            private readonly IEnumerable<IServiceProviderResolver> _resolvers;
             private readonly IEnumerable<IServiceProviderHook> _hooks;
             private static readonly Type[] _targetTypes = [typeof(IServiceProvider), typeof(IKeyedServiceProvider), typeof(IServiceProviderIsService), typeof(IServiceProviderIsKeyedService), typeof(ISupportRequiredService), typeof(IServiceScopeFactory)];
 
@@ -24,7 +24,8 @@ namespace ExtendedServiceProvider
                 _services = services;
                 _serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = false });
                 _logger = _serviceProvider.GetRequiredService<ILogger<ExtendedServiceProvider>>();
-                _resolver = resolver ?? _serviceProvider.GetService<IServiceProviderResolver>();
+                var resolvers = _serviceProvider.GetServices<IServiceProviderResolver>();
+                _resolvers = (resolver != null) ? resolvers.Concat([ resolver ]) : resolvers;
                 _hooks = _serviceProvider.GetServices<IServiceProviderHook>();
             }
 
@@ -56,7 +57,18 @@ namespace ExtendedServiceProvider
 
             private object? ResolveKeyedService(Type serviceType, object? serviceKey)
             {
-                return _resolver?.Resolve(_serviceProvider, serviceType, serviceKey);
+                object? service = null;
+
+                foreach (var resolver in _resolvers)
+                {
+                    service = resolver.Resolve(_serviceProvider, serviceType, serviceKey);
+                    if (service != null)
+                    {
+                        break;
+                    }
+                }
+
+                return service;
             }
 
             public object GetRequiredKeyedService(Type serviceType, object? serviceKey)

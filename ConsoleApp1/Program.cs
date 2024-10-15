@@ -32,11 +32,14 @@ namespace ConsoleApp1
             });
 
             services.AddServiceProviderHook<CustomHook>();
+            services.AddServiceProviderHook<PropertyInitializerServiceProviderHook>();
             services.AddSingleton<IMyType, MyType>();
+            services.AddSingleton<string>("ABCD");
 
             var serviceProvider = services.BuildExtendedServiceProvider();
 
-            var type = serviceProvider.GetService<IMyType>();
+            var type1 = serviceProvider.GetService<IMyType>();
+            var type2 = serviceProvider.GetService<IMyType>();
         }
     }
 }
