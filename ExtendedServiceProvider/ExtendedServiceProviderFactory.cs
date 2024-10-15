@@ -9,7 +9,7 @@ namespace ExtendedServiceProvider
         private readonly IServiceProviderResolver? _resolver;
 
         [DebuggerDisplay("ServiceDescriptors = {_services.Count}, Extended")]
-        class ExtendedServiceProvider : IKeyedServiceProvider, IServiceProviderIsService, IServiceProviderIsKeyedService, ISupportRequiredService, IServiceScopeFactory
+        internal class ExtendedServiceProvider : IKeyedServiceProvider, IServiceProviderIsService, IServiceProviderIsKeyedService, ISupportRequiredService, IServiceScopeFactory
         {
             private readonly IServiceCollection _services;
             private readonly ILogger<ExtendedServiceProvider> _logger;
@@ -18,11 +18,11 @@ namespace ExtendedServiceProvider
             private readonly IEnumerable<IServiceProviderHook> _hooks;
             private static readonly Type[] _targetTypes = [typeof(IServiceProvider), typeof(IKeyedServiceProvider), typeof(IServiceProviderIsService), typeof(IServiceProviderIsKeyedService), typeof(ISupportRequiredService), typeof(IServiceScopeFactory)];
 
-            public ExtendedServiceProvider(IServiceCollection services, IServiceProviderResolver? resolver, ServiceProviderOptions options)
+            public ExtendedServiceProvider(IServiceCollection services, IServiceProviderResolver? resolver)
             {
                 ArgumentNullException.ThrowIfNull(services, nameof(services));
                 _services = services;
-                _serviceProvider = services.BuildServiceProvider(options);
+                _serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = false });
                 _logger = _serviceProvider.GetRequiredService<ILogger<ExtendedServiceProvider>>();
                 _resolver = resolver ?? _serviceProvider.GetService<IServiceProviderResolver>();
                 _hooks = _serviceProvider.GetServices<IServiceProviderHook>();
@@ -106,7 +106,7 @@ namespace ExtendedServiceProvider
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
         {
             ArgumentNullException.ThrowIfNull(containerBuilder, nameof(containerBuilder));
-            return new ExtendedServiceProvider(containerBuilder, _resolver, new ServiceProviderOptions { ValidateScopes = false, ValidateOnBuild = true });
+            return new ExtendedServiceProvider(containerBuilder, _resolver);
         }
     }
 }

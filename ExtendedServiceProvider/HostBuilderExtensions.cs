@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 
 namespace ExtendedServiceProvider
 {
@@ -8,14 +7,6 @@ namespace ExtendedServiceProvider
         public static IHostBuilder UseExtendedServiceProvider(this IHostBuilder builder, IServiceProviderResolver? resolver = null)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            builder.ConfigureContainer<IServiceCollection>((ctx, services) =>
-            {
-                ctx.ToString();
-            });
-            builder.ConfigureServices((ctx, services) =>
-            {
-                ctx.ToString();
-            });
             return builder.UseServiceProviderFactory(new ExtendedServiceProviderFactory(resolver));
         }
     }

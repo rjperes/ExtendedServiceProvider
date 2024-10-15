@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp1", "ConsoleApp1\ConsoleApp1.csproj", "{841C53C8-9574-4BAA-9E99-FF1795B353EA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{5A867DF1-51D4-4904-BC27-66961259A036}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5A867DF1-51D4-4904-BC27-66961259A036}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5A867DF1-51D4-4904-BC27-66961259A036}.Release|Any CPU.Build.0 = Release|Any CPU
+		{841C53C8-9574-4BAA-9E99-FF1795B353EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{841C53C8-9574-4BAA-9E99-FF1795B353EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{841C53C8-9574-4BAA-9E99-FF1795B353EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{841C53C8-9574-4BAA-9E99-FF1795B353EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
