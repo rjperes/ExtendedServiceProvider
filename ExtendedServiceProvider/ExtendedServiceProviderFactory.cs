@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace ExtendedServiceProvider
 {
@@ -6,28 +7,42 @@ namespace ExtendedServiceProvider
     {
         private readonly IServiceProviderResolver? _resolver;
 
-        class ExtendedServiceProvider : IKeyedServiceProvider
+        class ExtendedServiceProvider : IKeyedServiceProvider, IServiceProviderIsService, IServiceProviderIsKeyedService, ISupportRequiredService, IServiceScopeFactory
         {
+            private readonly IServiceCollection _services;
+            private readonly ILogger<ExtendedServiceProvider> _logger;
             private readonly IKeyedServiceProvider _serviceProvider;
             private readonly IServiceProviderResolver? _resolver;
             private readonly IEnumerable<IServiceProviderHook> _hooks;
 
-            public ExtendedServiceProvider(IKeyedServiceProvider serviceProvider, IServiceProviderResolver? resolver)
+            public ExtendedServiceProvider(IServiceCollection services, IServiceProviderResolver? resolver)
             {
-                ArgumentNullException.ThrowIfNull(serviceProvider, nameof(serviceProvider));
-                _serviceProvider = serviceProvider;
-                _resolver = resolver ?? serviceProvider.GetService<IServiceProviderResolver>();
-                _hooks = serviceProvider.GetServices<IServiceProviderHook>();
+                ArgumentNullException.ThrowIfNull(services, nameof(services));
+
+                _services = services;
+                _serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+                _logger = _serviceProvider.GetRequiredService<ILogger<ExtendedServiceProvider>>();
+                _resolver = resolver ?? _serviceProvider.GetService<IServiceProviderResolver>();
+                _hooks = _serviceProvider.GetServices<IServiceProviderHook>();
             }
 
             public object? GetKeyedService(Type serviceType, object? serviceKey)
             {
                 ArgumentNullException.ThrowIfNull(serviceType, nameof(serviceType));
 
+                _logger.LogDebug($"GetKeyedService: serviceType: {serviceType} serviceKey: {serviceKey}");
+
+                Type[] targetTypes = [ typeof(IServiceProvider), typeof(IKeyedServiceProvider), typeof(IServiceProviderIsService), typeof(IServiceProviderIsKeyedService), typeof(ISupportRequiredService), typeof(IServiceScopeFactory) ];
+
+                if (targetTypes.Contains(serviceType))
+                {
+                    return this;
+                }
+
                 var service = ResolveKeyedService(serviceType, serviceKey) ?? _serviceProvider.GetKeyedService(serviceType, serviceKey);
 
                 if (service != null)
-                {                    
+                {
                     foreach (var hook in _hooks)
                     {
                         hook.ServiceResolved(serviceType, service);
@@ -53,6 +68,26 @@ namespace ExtendedServiceProvider
             {
                 return GetKeyedService(serviceType, null);
             }
+
+            public object GetRequiredService(Type serviceType)
+            {
+                return GetRequiredKeyedService(serviceType, null);
+            }
+
+            public bool IsService(Type serviceType)
+            {
+                return IsKeyedService(serviceType, null);
+            }
+
+            public bool IsKeyedService(Type serviceType, object? serviceKey)
+            {
+                return _services.Any(x => x.ServiceType == serviceType && x.ServiceKey == serviceKey);
+            }
+
+            public IServiceScope CreateScope()
+            {
+                return _serviceProvider.CreateScope();
+            }
         }
 
         public ExtendedServiceProviderFactory(IServiceProviderResolver? resolver = null)
@@ -62,12 +97,14 @@ namespace ExtendedServiceProvider
 
         public IServiceCollection CreateBuilder(IServiceCollection services)
         {
+            ArgumentNullException.ThrowIfNull(services, nameof(services));
             return services;
         }
 
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
         {
-            return new ExtendedServiceProvider(containerBuilder.BuildServiceProvider(), _resolver);
+            ArgumentNullException.ThrowIfNull(containerBuilder, nameof(containerBuilder));
+            return new ExtendedServiceProvider(containerBuilder, _resolver);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace WebApplication1.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        public IActionResult Index([FromServices] IMyType type, [FromServices] IServiceProvider serviceProvider)
         {
             return View();
         }

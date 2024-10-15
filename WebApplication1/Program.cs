@@ -11,11 +11,15 @@ namespace WebApplication1
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
-            builder.Services.AddSingleton<IServiceProviderHook, CustomServiceProviderHook>();
-            builder.Services.AddSingleton<IServiceProviderResolver, CustomServiceProviderResolver>();
+            builder.Services.AddSingleton<IServiceProviderHook, PropertyInitializerServiceProviderHook>();
+            //builder.Services.AddSingleton<IServiceProviderResolver, CustomServiceProviderResolver>();
             builder.Services.AddSingleton<IMyType, MyType>();
+            builder.Services.AddSingleton<string>("ABCD");
 
             var app = builder.Build();
+
+            //app.Services.GetRequiredKeyedService<string>("ABCD");
+            //app.Services.GetService<IMyType>();
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -24,8 +28,6 @@ namespace WebApplication1
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-
-            //app.Services.GetRequiredKeyedService<string>("aaa");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

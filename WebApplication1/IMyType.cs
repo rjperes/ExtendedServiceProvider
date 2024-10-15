@@ -1,6 +1,6 @@
 ﻿namespace WebApplication1
 {
-    internal interface IMyType
+    public interface IMyType
     {
     }
 }

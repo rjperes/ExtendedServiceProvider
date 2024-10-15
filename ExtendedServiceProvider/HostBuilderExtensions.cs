@@ -4,9 +4,10 @@ namespace ExtendedServiceProvider
 {
     public static class HostBuilderExtensions
     {
-        public static IHostBuilder UseExtendedServiceProvider(this IHostBuilder builder)
+        public static IHostBuilder UseExtendedServiceProvider(this IHostBuilder builder, IServiceProviderResolver? resolver = null)
         {
-            return builder.UseServiceProviderFactory(new ExtendedServiceProviderFactory());
+            ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+            return builder.UseServiceProviderFactory(new ExtendedServiceProviderFactory(resolver));
         }
     }
 }
