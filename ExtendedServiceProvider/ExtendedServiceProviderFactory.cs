@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Diagnostics;
 
 namespace ExtendedServiceProvider
 {
@@ -7,6 +8,7 @@ namespace ExtendedServiceProvider
     {
         private readonly IServiceProviderResolver? _resolver;
 
+        [DebuggerDisplay("ServiceDescriptors = {_services.Count}, Extended")]
         class ExtendedServiceProvider : IKeyedServiceProvider, IServiceProviderIsService, IServiceProviderIsKeyedService, ISupportRequiredService, IServiceScopeFactory
         {
             private readonly IServiceCollection _services;
@@ -14,27 +16,27 @@ namespace ExtendedServiceProvider
             private readonly IKeyedServiceProvider _serviceProvider;
             private readonly IServiceProviderResolver? _resolver;
             private readonly IEnumerable<IServiceProviderHook> _hooks;
+            private static readonly Type[] _targetTypes = [typeof(IServiceProvider), typeof(IKeyedServiceProvider), typeof(IServiceProviderIsService), typeof(IServiceProviderIsKeyedService), typeof(ISupportRequiredService), typeof(IServiceScopeFactory)];
 
-            public ExtendedServiceProvider(IServiceCollection services, IServiceProviderResolver? resolver)
+            public ExtendedServiceProvider(IServiceCollection services, IServiceProviderResolver? resolver, ServiceProviderOptions options)
             {
                 ArgumentNullException.ThrowIfNull(services, nameof(services));
-
                 _services = services;
-                _serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+                _serviceProvider = services.BuildServiceProvider(options);
                 _logger = _serviceProvider.GetRequiredService<ILogger<ExtendedServiceProvider>>();
                 _resolver = resolver ?? _serviceProvider.GetService<IServiceProviderResolver>();
                 _hooks = _serviceProvider.GetServices<IServiceProviderHook>();
             }
 
+            public IServiceCollection Services => _services;
+
             public object? GetKeyedService(Type serviceType, object? serviceKey)
             {
                 ArgumentNullException.ThrowIfNull(serviceType, nameof(serviceType));
 
-                _logger.LogDebug($"GetKeyedService: serviceType: {serviceType} serviceKey: {serviceKey}");
+                _logger.LogDebug($"GetKeyedService: serviceType: {serviceType}, serviceKey: {serviceKey}");
 
-                Type[] targetTypes = [ typeof(IServiceProvider), typeof(IKeyedServiceProvider), typeof(IServiceProviderIsService), typeof(IServiceProviderIsKeyedService), typeof(ISupportRequiredService), typeof(IServiceScopeFactory) ];
-
-                if (targetTypes.Contains(serviceType))
+                if (_targetTypes.Contains(serviceType) && serviceKey is null)
                 {
                     return this;
                 }
@@ -61,7 +63,7 @@ namespace ExtendedServiceProvider
             {
                 var service = GetKeyedService(serviceType, serviceKey);
 
-                return service == null ? throw new InvalidOperationException($"No service for type '{serviceType}' has been registered.") : service;
+                return service is null ? throw new InvalidOperationException($"No service for type '{serviceType}' has been registered.") : service;
             }
 
             public object? GetService(Type serviceType)
@@ -104,7 +106,7 @@ namespace ExtendedServiceProvider
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
         {
             ArgumentNullException.ThrowIfNull(containerBuilder, nameof(containerBuilder));
-            return new ExtendedServiceProvider(containerBuilder, _resolver);
+            return new ExtendedServiceProvider(containerBuilder, _resolver, new ServiceProviderOptions { ValidateScopes = false, ValidateOnBuild = true });
         }
     }
 }
