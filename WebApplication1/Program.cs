@@ -11,6 +11,7 @@ namespace WebApplication1
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddServiceProviderHook<CustomServiceProviderHook>();
             builder.Services.AddServiceProviderHook<PropertyInitializerServiceProviderHook>();
             builder.Services.AddServiceProviderResolver<CustomServiceProviderResolver>();
             builder.Services.AddSingleton<IMyType, MyType>();

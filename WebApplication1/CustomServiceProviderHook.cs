@@ -6,7 +6,10 @@ namespace WebApplication1
     {
         public void ServiceResolved(Type serviceType, object service)
         {
-
+            if (serviceType == typeof(IMyType))
+            {
+                serviceType.ToString();
+            }
         }
     }
 }
