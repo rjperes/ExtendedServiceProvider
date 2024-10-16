@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace ExtendedServiceProvider
 {
@@ -15,7 +16,7 @@ namespace ExtendedServiceProvider
 
         public async Task InvokeAsync(HttpContext context)
         {
-            context.RequestServices = _serviceProvider;
+            context.Features.Set((IServiceProvidersFeature)_serviceProvider);
             await _next(context);
         }
     }

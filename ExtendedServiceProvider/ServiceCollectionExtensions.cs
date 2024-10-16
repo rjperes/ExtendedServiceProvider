@@ -7,7 +7,7 @@ namespace ExtendedServiceProvider
         public static IServiceProvider BuildExtendedServiceProvider(this IServiceCollection services, IServiceProviderResolver? resolver = null)
         {
             ArgumentNullException.ThrowIfNull(services, nameof(services));
-            return new ExtendedServiceProviderFactory.ExtendedServiceProvider(services, resolver);
+            return new ExtendedServiceProvider(services, resolver);
         }
 
         public static IServiceCollection AddServiceProviderHook<THook>(this IServiceCollection services) where THook : class, IServiceProviderHook
