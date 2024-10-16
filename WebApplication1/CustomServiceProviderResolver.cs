@@ -6,7 +6,7 @@ namespace WebApplication1
     {
         public object? Resolve(IKeyedServiceProvider serviceProvider, Type serviceType, object? serviceKey)
         {
-            return serviceProvider.GetKeyedService(serviceType, serviceKey);
+            return null;
         }
     }
 }

@@ -29,7 +29,6 @@ namespace WebApplication1
                 app.UseHsts();
             }
 
-            app.UseExtendedProvider();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();

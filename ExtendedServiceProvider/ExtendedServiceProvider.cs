@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
@@ -10,7 +9,7 @@ namespace ExtendedServiceProvider
     }
 
     [DebuggerDisplay("ServiceDescriptors = {_services.Count}, Extended")]
-    internal class ExtendedServiceProvider : IExtendedServiceProvider, IServiceProvidersFeature
+    internal class ExtendedServiceProvider : IExtendedServiceProvider
     {
         private readonly IServiceCollection _services;
         private readonly ILogger<ExtendedServiceProvider> _logger;
@@ -19,20 +18,15 @@ namespace ExtendedServiceProvider
         private readonly IEnumerable<IServiceProviderHook> _hooks;
         private static readonly Type[] _targetTypes = [typeof(IExtendedServiceProvider), typeof(IServiceProvider), typeof(IKeyedServiceProvider), typeof(IServiceProviderIsService), typeof(IServiceProviderIsKeyedService), typeof(ISupportRequiredService), typeof(IServiceScopeFactory)];
 
-        public IServiceProvider RequestServices
-        {
-            get => this;
-            set { }
-        }
-
         public ExtendedServiceProvider(IServiceCollection services, IServiceProviderResolver? resolver)
         {
             ArgumentNullException.ThrowIfNull(services, nameof(services));
             _services = services;
-            _serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = false });
+            _serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+            _serviceProvider = (_serviceProvider.CreateScope().ServiceProvider as IKeyedServiceProvider)!;
             _logger = _serviceProvider.GetRequiredService<ILogger<ExtendedServiceProvider>>();
             var resolvers = _serviceProvider.GetServices<IServiceProviderResolver>();
-            _resolvers = (resolver != null) ? resolvers.Concat([ resolver ]) : resolvers;
+            _resolvers = (resolver != null) ? resolvers.Concat([resolver]) : resolvers;
             _hooks = _serviceProvider.GetServices<IServiceProviderHook>();
         }
 

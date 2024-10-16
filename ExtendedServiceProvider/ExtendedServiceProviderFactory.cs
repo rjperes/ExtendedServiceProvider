@@ -4,6 +4,7 @@ namespace ExtendedServiceProvider
 {
     internal class ExtendedServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
     {
+        private IServiceProvider? _serviceProvider;
         private readonly IServiceProviderResolver? _resolver;
 
         public ExtendedServiceProviderFactory(IServiceProviderResolver? resolver = null)
@@ -20,7 +21,7 @@ namespace ExtendedServiceProvider
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
         {
             ArgumentNullException.ThrowIfNull(containerBuilder, nameof(containerBuilder));
-            return new ExtendedServiceProvider(containerBuilder, _resolver);
+            return _serviceProvider is null ? _serviceProvider = new ExtendedServiceProvider(containerBuilder, _resolver) : _serviceProvider;
         }
     }
 }
