@@ -6,10 +6,10 @@ namespace ExtendedServiceProvider
 {
     public static class HostBuilderExtensions
     {
-        public static IHostBuilder UseExtendedServiceProvider(this IHostBuilder builder, IServiceProviderResolver? resolver = null)
+        public static IHostBuilder UseExtendedServiceProvider(this IHostBuilder builder, ServiceProviderOptions? options = null, IServiceProviderResolver? resolver = null)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            var serviceProviderFactory = new ExtendedServiceProviderFactory(resolver);
+            var serviceProviderFactory = new ExtendedServiceProviderFactory(options ?? new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }, resolver);
             return builder
                 .UseServiceProviderFactory(serviceProviderFactory)
                 .ConfigureServices((ctx, services) =>
