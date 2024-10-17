@@ -6,9 +6,11 @@ namespace ExtendedServiceProvider
     {
         private IServiceProvider? _serviceProvider;
         private readonly IServiceProviderResolver? _resolver;
+        private readonly ServiceProviderOptions? _options;
 
-        public ExtendedServiceProviderFactory(IServiceProviderResolver? resolver = null)
+        public ExtendedServiceProviderFactory(ServiceProviderOptions? options = null, IServiceProviderResolver? resolver = null)
         {
+            _options = options ?? new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true };
             _resolver = resolver;
         }
 
@@ -21,7 +23,7 @@ namespace ExtendedServiceProvider
         public IServiceProvider CreateServiceProvider(IServiceCollection containerBuilder)
         {
             ArgumentNullException.ThrowIfNull(containerBuilder, nameof(containerBuilder));
-            return _serviceProvider is null ? _serviceProvider = new ExtendedServiceProvider(containerBuilder, _resolver) : _serviceProvider;
+            return _serviceProvider is null ? _serviceProvider = new ExtendedServiceProvider(containerBuilder, _options, _resolver) : _serviceProvider;
         }
     }
 }
