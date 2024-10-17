@@ -4,10 +4,10 @@ namespace ExtendedServiceProvider
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceProvider BuildExtendedServiceProvider(this IServiceCollection services, IServiceProviderResolver? resolver = null)
+        public static IServiceProvider BuildExtendedServiceProvider(this IServiceCollection services, ServiceProviderOptions? options = null, IServiceProviderResolver? resolver = null)
         {
             ArgumentNullException.ThrowIfNull(services, nameof(services));
-            return new ExtendedServiceProvider(services, resolver);
+            return new ExtendedServiceProvider(services, options, resolver);
         }
 
         public static IServiceCollection AddServiceProviderHook<THook>(this IServiceCollection services) where THook : class, IServiceProviderHook
