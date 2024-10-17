@@ -18,11 +18,11 @@ namespace ExtendedServiceProvider
         private readonly IEnumerable<IServiceProviderHook> _hooks;
         private static readonly Type[] _targetTypes = [typeof(IExtendedServiceProvider), typeof(IServiceProvider), typeof(IKeyedServiceProvider), typeof(IServiceProviderIsService), typeof(IServiceProviderIsKeyedService), typeof(ISupportRequiredService), typeof(IServiceScopeFactory)];
 
-        public ExtendedServiceProvider(IServiceCollection services, IServiceProviderResolver? resolver)
+        public ExtendedServiceProvider(IServiceCollection services, ServiceProviderOptions? options = null, IServiceProviderResolver? resolver)
         {
             ArgumentNullException.ThrowIfNull(services, nameof(services));
             _services = services;
-            _serviceProvider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+            _serviceProvider = services.BuildServiceProvider(options ?? new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
             _serviceProvider = (_serviceProvider.CreateScope().ServiceProvider as IKeyedServiceProvider)!;
             _logger = _serviceProvider.GetRequiredService<ILogger<ExtendedServiceProvider>>();
             var resolvers = _serviceProvider.GetServices<IServiceProviderResolver>();
