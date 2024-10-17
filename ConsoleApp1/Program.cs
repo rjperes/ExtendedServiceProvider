@@ -43,7 +43,7 @@ namespace ConsoleApp1
             var type2 = serviceProvider.GetService<IMyType>();
             var otherLazyType = serviceProvider.GetLazyService<MyOtherType>();
             var isOtherTypeCreated = otherLazyType.IsValueCreated;
-            MyOtherType otherType = otherLazyType;
+            MyOtherType otherType = otherLazyType.Value;
         }
     }
 }
