@@ -27,10 +27,12 @@ namespace ExtendedServiceProvider
     public sealed class PropertyInitializerServiceProviderHook : IServiceProviderHook
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogger<PropertyInitializerServiceProviderHook> _logger;
 
         public PropertyInitializerServiceProviderHook(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
+            _logger = serviceProvider.GetRequiredService<ILogger<PropertyInitializerServiceProviderHook>>();
         }
 
         public void ServiceResolved(Type serviceType, object service)
@@ -43,6 +45,7 @@ namespace ExtendedServiceProvider
                 {
                     if (prop.GetValue(service) == null)
                     {
+                        _logger.LogDebug($"ServiceResolved: serviceType = {serviceType}, setting {prop.Name}");
                         var propertyService = _serviceProvider.GetRequiredKeyedService(prop.PropertyType, injectPropertyAttribute.ServiceKey);
                         prop.SetValue(service, propertyService);
                     }

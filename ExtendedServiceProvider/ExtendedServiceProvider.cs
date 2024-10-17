@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Collections;
 using System.Diagnostics;
 
 namespace ExtendedServiceProvider
@@ -9,7 +10,7 @@ namespace ExtendedServiceProvider
     }
 
     [DebuggerDisplay("ServiceDescriptors = {_services.Count}, Extended")]
-    internal class ExtendedServiceProvider : IExtendedServiceProvider
+    internal class ExtendedServiceProvider : IExtendedServiceProvider, IEnumerable<ServiceDescriptor>
     {
         private readonly IServiceCollection _services;
         private readonly ILogger<ExtendedServiceProvider> _logger;
@@ -34,7 +35,7 @@ namespace ExtendedServiceProvider
         {
             ArgumentNullException.ThrowIfNull(serviceType, nameof(serviceType));
 
-            _logger.LogDebug($"GetKeyedService: serviceType: {serviceType}, serviceKey: {serviceKey}");
+            _logger.LogDebug($"GetKeyedService: serviceType = {serviceType}, serviceKey = {serviceKey}");
 
             if (_selfTypes.Contains(serviceType) && serviceKey is null)
             {
@@ -74,33 +75,21 @@ namespace ExtendedServiceProvider
         public object GetRequiredKeyedService(Type serviceType, object? serviceKey)
         {
             var service = GetKeyedService(serviceType, serviceKey);
-
             return service is null ? throw new InvalidOperationException($"No service for type '{serviceType}' has been registered.") : service;
         }
 
-        public object? GetService(Type serviceType)
-        {
-            return GetKeyedService(serviceType, null);
-        }
+        public object? GetService(Type serviceType) => GetKeyedService(serviceType, null);
 
-        public object GetRequiredService(Type serviceType)
-        {
-            return GetRequiredKeyedService(serviceType, null);
-        }
+        public object GetRequiredService(Type serviceType) => GetRequiredKeyedService(serviceType, null);
 
-        public bool IsService(Type serviceType)
-        {
-            return IsKeyedService(serviceType, null);
-        }
+        public bool IsService(Type serviceType) => IsKeyedService(serviceType, null);
 
-        public bool IsKeyedService(Type serviceType, object? serviceKey)
-        {
-            return _services.Any(x => x.ServiceType == serviceType && x.ServiceKey == serviceKey);
-        }
+        public bool IsKeyedService(Type serviceType, object? serviceKey) => _services.Any(x => x.ServiceType == serviceType && x.ServiceKey == serviceKey);
 
-        public IServiceScope CreateScope()
-        {
-            return _serviceProvider.CreateScope();
-        }
+        public IServiceScope CreateScope() => _serviceProvider.CreateScope();
+
+        public IEnumerator<ServiceDescriptor> GetEnumerator() => _services.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => _services.GetEnumerator();
     }
 }
