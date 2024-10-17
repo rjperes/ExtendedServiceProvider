@@ -4,9 +4,9 @@ namespace ExtendedServiceProvider
 {
     public static class ApplicationBuilderExtensions
     {
-        public static IApplicationBuilder UseExtendedProvider(this IApplicationBuilder app)
+        public static IApplicationBuilder UseExtendedProvider(this IApplicationBuilder app, ServiceProviderOptions? options = null)
         {
-            return app.UseMiddleware<ExtendedServiceProviderMiddleware>();
+            return app.UseMiddleware<ExtendedServiceProviderMiddleware>(options);
         }
     }
 }
