@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System.Reflection;
 
 namespace ExtendedServiceProvider
@@ -6,6 +7,21 @@ namespace ExtendedServiceProvider
     public interface IServiceProviderHook
     {
         void ServiceResolved(Type serviceType, object service);
+    }
+
+    public sealed class LoggerServiceProviderHook : IServiceProviderHook
+    {
+        private readonly ILogger<LoggerServiceProviderHook> _logger;
+
+        public LoggerServiceProviderHook(ILogger<LoggerServiceProviderHook> logger)
+        {
+            _logger = logger;
+        }
+
+        public void ServiceResolved(Type serviceType, object service)
+        {
+            _logger.LogDebug($"ServiceResolved: serviceType = {serviceType}, service = {service}");
+        }
     }
 
     public sealed class PropertyInitializerServiceProviderHook : IServiceProviderHook

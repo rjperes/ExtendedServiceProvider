@@ -35,11 +35,15 @@ namespace ConsoleApp1
             services.AddServiceProviderHook<PropertyInitializerServiceProviderHook>();
             services.AddSingleton<IMyType, MyType>();
             services.AddSingleton<string>("ABCD");
+            services.AddSingleton<MyOtherType>();
 
             var serviceProvider = services.BuildExtendedServiceProvider();
 
             var type1 = serviceProvider.GetService<IMyType>();
             var type2 = serviceProvider.GetService<IMyType>();
+            var otherLazyType = serviceProvider.GetLazyService<MyOtherType>();
+            var isOtherTypeCreated = otherLazyType.IsValueCreated;
+            MyOtherType otherType = otherLazyType;
         }
     }
 }

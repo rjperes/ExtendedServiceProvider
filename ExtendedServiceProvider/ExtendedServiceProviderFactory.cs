@@ -4,13 +4,15 @@ namespace ExtendedServiceProvider
 {
     internal class ExtendedServiceProviderFactory : IServiceProviderFactory<IServiceCollection>
     {
+        internal static readonly ServiceProviderOptions DefaultServiceProviderOptions = new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true };
+
         private IServiceProvider? _serviceProvider;
         private readonly IServiceProviderResolver? _resolver;
         private readonly ServiceProviderOptions? _options;
 
         public ExtendedServiceProviderFactory(ServiceProviderOptions? options = null, IServiceProviderResolver? resolver = null)
         {
-            _options = options ?? new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true };
+            _options = options;
             _resolver = resolver;
         }
 

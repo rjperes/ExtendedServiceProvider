@@ -16,13 +16,13 @@ namespace ExtendedServiceProvider
         private readonly IKeyedServiceProvider _serviceProvider;
         private readonly IEnumerable<IServiceProviderResolver> _resolvers;
         private readonly IEnumerable<IServiceProviderHook> _hooks;
-        private static readonly Type[] _targetTypes = [typeof(IExtendedServiceProvider), typeof(IServiceProvider), typeof(IKeyedServiceProvider), typeof(IServiceProviderIsService), typeof(IServiceProviderIsKeyedService), typeof(ISupportRequiredService), typeof(IServiceScopeFactory)];
+        private static readonly Type[] _selfTypes = [typeof(IExtendedServiceProvider), typeof(IServiceProvider), typeof(IKeyedServiceProvider), typeof(IServiceProviderIsService), typeof(IServiceProviderIsKeyedService), typeof(ISupportRequiredService), typeof(IServiceScopeFactory)];
 
-        public ExtendedServiceProvider(IServiceCollection services, ServiceProviderOptions? options = null, IServiceProviderResolver? resolver)
+        public ExtendedServiceProvider(IServiceCollection services, ServiceProviderOptions? options = null, IServiceProviderResolver? resolver = null)
         {
             ArgumentNullException.ThrowIfNull(services, nameof(services));
             _services = services;
-            _serviceProvider = services.BuildServiceProvider(options ?? new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
+            _serviceProvider = services.BuildServiceProvider(options ?? ExtendedServiceProviderFactory.DefaultServiceProviderOptions);
             _serviceProvider = (_serviceProvider.CreateScope().ServiceProvider as IKeyedServiceProvider)!;
             _logger = _serviceProvider.GetRequiredService<ILogger<ExtendedServiceProvider>>();
             var resolvers = _serviceProvider.GetServices<IServiceProviderResolver>();
@@ -36,7 +36,7 @@ namespace ExtendedServiceProvider
 
             _logger.LogDebug($"GetKeyedService: serviceType: {serviceType}, serviceKey: {serviceKey}");
 
-            if (_targetTypes.Contains(serviceType) && serviceKey is null)
+            if (_selfTypes.Contains(serviceType) && serviceKey is null)
             {
                 _logger.LogDebug($"GetKeyedService: asking for {serviceType}, returning self");
                 return this;

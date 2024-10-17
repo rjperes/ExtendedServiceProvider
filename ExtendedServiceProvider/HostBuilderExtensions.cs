@@ -9,7 +9,7 @@ namespace ExtendedServiceProvider
         public static IHostBuilder UseExtendedServiceProvider(this IHostBuilder builder, ServiceProviderOptions? options = null, IServiceProviderResolver? resolver = null)
         {
             ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-            var serviceProviderFactory = new ExtendedServiceProviderFactory(options ?? new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }, resolver);
+            var serviceProviderFactory = new ExtendedServiceProviderFactory(options ?? ExtendedServiceProviderFactory.DefaultServiceProviderOptions, resolver);
             return builder
                 .UseServiceProviderFactory(serviceProviderFactory)
                 .ConfigureServices((ctx, services) =>
