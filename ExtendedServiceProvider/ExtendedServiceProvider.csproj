@@ -4,6 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>ExtendedServiceProvider</Title>
+    <Authors>Ricardo Peres</Authors>
+    <Copyright>Ricardo Peres</Copyright>
+    <PackageProjectUrl>https://github.com/rjperes/ExtendedServiceProvider</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
